@@ -1,0 +1,18 @@
+# How many points before a mail is considered spam.
+required_score           3
+
+# Enable Bayes
+use_bayes               1
+bayes_auto_learn        1
+
+# Enable Bayesian filtering
+bayes_auto_expire       1
+bayes_ignore_header     X-Bogosity
+bayes_ignore_header     X-Spam-Flag
+bayes_ignore_header     X-Spam-Status
+bayes_ignore_header     X-Spam-Report
+
+# Set Bayesian minimum and maximum score
+bayes_min_ham_num       100
+bayes_min_spam_num      100
+bayes_learn_to_journal  1

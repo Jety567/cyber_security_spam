@@ -1,0 +1,18 @@
+# How many points before a mail is considered spam.
+required_score           3
+
+# Enable body analysis
+body URIBL_BLOCKED eval:check_uridnsbl('BLOCKED', 'cbl.abuseat.org.', 'Query for dynamic IP addresses in the CBL')
+
+# Set scores for body-based rules
+score URIBL_BLOCKED 3.0
+score BODY_SINGLE_WORD 1.5
+score HTML_MESSAGE 1.0
+score MIME_HTML_ONLY 1.0
+score BAYES_99 2.0
+score BAYES_00 -2.0
+
+# Adjust other SpamAssassin settings as needed
+report_safe 0
+use_bayes 1
+bayes_auto_learn 1

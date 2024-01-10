@@ -1,0 +1,18 @@
+# How many points before a mail is considered spam.
+required_score           3
+
+# Enable header analysis
+header FH_DATE_PAST_20XX Date =~ /20[2-9][0-9]/ [if-unset: 2006]
+header SPF_HELO_PASS eval:check_spf_helo_aligned()
+
+# Set scores for header-based rules
+score FH_DATE_PAST_20XX 2.0
+score SPF_HELO_PASS -1.0
+score MISSING_DATE 1.0
+score MISSING_SUBJECT 1.0
+score MISSING_HEADERS 1.5
+score FORGED_HOTMAIL_RCVD 2.0
+
+# Adjust other SpamAssassin settings as needed
+report_safe 0
+use_bayes 0

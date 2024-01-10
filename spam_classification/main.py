@@ -2,56 +2,106 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics import accuracy_score, classification_report
-from flask import Flask, render_template, request, jsonify
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import os
+import matplotlib.pyplot as plt
+import seaborn as sns
+import email
 
-print("Start")
-df = pd.read_csv('mail_data.csv')
-df['Category'] = df['Category'].apply(lambda x: 1 if x == 'spam' else 0)
+def train_model(df):
+    df['labeled'] = df['labeled'].apply(lambda x: 1 if x else 0)
 
-df['Message'] = df['Message'].str.lower()  # Convert to lowercase
-df['Message'] = df['Message'].str.replace('[^\w\s]', '')  # Remove punctuation
+    df['content'] = df['content'].apply(lambda x: str(x))
 
-# Step 3: Feature extraction using TF-IDF
-tfidf_vectorizer = TfidfVectorizer(stop_words='english')
-X = tfidf_vectorizer.fit_transform(df['Message'])
-y = df['Category']  # Assuming 'label' is the column containing 0 for ham and 1 for spam
+    df['content'] = df['content'].str.lower()
+    df['content'] = df['content'].str.replace('[^\w\s]', '')
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    tfidf_vectorizer = TfidfVectorizer(stop_words='english')
+    X = tfidf_vectorizer.fit_transform(df['content'])
+    y = df['labeled']
 
-# Step 5: Build the Logistic Regression model
-model = LogisticRegression()
-model.fit(X_train, y_train)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=42)
 
-# Step 6: Train the model
-y_pred = model.predict(X_test)
+    # Step 5: Build the Logistic Regression model
+    model = LogisticRegression()
+    model.fit(X_train, y_train)
 
-app = Flask(__name__)
+    model.tfidf_vectorizer = tfidf_vectorizer
+
+    # Step 6: Train the model
+    y_pred = model.predict(X_test)
+
+    accuracy = accuracy_score(y_test, y_pred)
+
+    cm = confusion_matrix(y_test, y_pred)
+
+    # Extract values from confusion matrix
+    tn, fp, fn, tp = cm.ravel()
+
+    # Calculate TPR, TNR, F1-Score, and other metrics
+    tpr = tp / (tp + fn)
+    tnr = tn / (tn + fp)
+    f1_score = 2 * tp / (2 * tp + fp + fn)
+
+    labels = ['True Negative', 'False Positive', 'False Negative', 'True Positive']
+    categories = ['0', '1']
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=categories, yticklabels=categories)
+    plt.xlabel('Predicted Label')
+    plt.ylabel('True Label')
+    plt.title('Confusion Matrix')
+    plt.show()
+
+    # Print results
+    print(f'True Positive Rate (TPR): {tpr:.2%}')
+    print(f'True Negative Rate (TNR): {tnr:.2%}')
+    print(f'F1 Score: {f1_score:.2%}')
+
+    print(f"Accuracy: {accuracy:.2f}")
+
+    report = classification_report(y_test, y_pred)
+
+    print("Classification Report:")
+    print(report)
 
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+    return model
 
 
-@app.route('/predict', methods=['POST'])
-def predict():
-    if request.method == 'POST':
-        user_email = request.form['email']
+def extract(directory_path, data, spam):
+    for filename in os.listdir(directory_path):
+        eml_path = os.path.join(directory_path, filename)
+        with open(eml_path, 'r', encoding='utf-8', errors='ignore') as file:
+            file_content = file.read().strip()
+            msg = email.message_from_string(file_content)
+            if msg.get_payload() == "":
+                data['content'].append(file_content)
+                data['Subject'].append("")
+            else:
+                data['content'].append(msg.get_payload())
+                data['Subject'].append(msg['Subject'])
+            data['labeled'].append(spam)
 
-        # Preprocess the user input
-        user_input = pd.Series([user_email])
-        user_input = user_input.str.lower()
-        user_input = user_input.str.replace('[^\w\s]', '')
+    return data
 
-        # Transform the user input using the same TF-IDF vectorizer
-        user_input_transformed = tfidf_vectorizer.transform(user_input)
 
-        # Make a prediction
-        prediction = model.predict(user_input_transformed)
+def get_data():
+    data = {'Subject': [], 'content': [], 'labeled': []}
 
-        # Return the prediction as JSON
-        return jsonify({'prediction': int(prediction[0])})
+    directory_path = "/Users/patrickweber/PycharmProjects/spam_classification/spam"
+
+    data = extract(directory_path, data, 1)
+
+    directory_path = "/Users/patrickweber/PycharmProjects/spam_classification/ham"
+
+    data = extract(directory_path, data, 0)
+
+    df = pd.DataFrame(data)
+
+    print(len(df))
+
+    return df
+
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    df = get_data()
+    model = train_model(df)

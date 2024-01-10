@@ -1,0 +1,64 @@
+Reference Test with reference.cf
+SCORE 6
+
+{'ham': 750, 'ham_correct': 73, 'spam': 150, 'spam_correct': 97}
+
+SCORE 3
+
+{'ham': 750, 'ham_correct': 541, 'spam': 150, 'spam_correct': 129}
+
+SCORE 1
+
+{'ham': 750, 'ham_correct': 451, 'spam': 150, 'spam_correct': 147}
+
+baies.cf
+SCORE 6
+
+{'ham': 750, 'ham_correct': 90, 'spam': 150, 'spam_correct': 97}
+
+SCORE 3
+
+{'ham': 750, 'ham_correct': 530, 'spam': 150, 'spam_correct': 131}
+
+SCORE 1
+
+{'ham': 750, 'ham_correct': 410, 'spam': 150, 'spam_correct': 149}
+
+body_analysis.cf
+SCORE 6
+
+{'ham': 750, 'ham_correct': 692, 'spam': 150, 'spam_correct': 104}
+
+SCORE 3
+
+{'ham': 750, 'ham_correct': 722, 'spam': 150, 'spam_correct': 104}
+
+SCORE 1
+
+{'ham': 750, 'ham_correct': 680, 'spam': 150, 'spam_correct': 132}
+
+header_analysis.cf
+SCORE 6
+
+{'ham': 750, 'ham_correct': 722, 'spam': 150, 'spam_correct': 104}
+
+SCORE 3
+
+{'ham': 750, 'ham_correct': 722, 'spam': 150, 'spam_correct': 104}
+
+SCORE 1
+
+{'ham': 750, 'ham_correct': 722, 'spam': 150, 'spam_correct': 104}
+
+rule_based.cf
+SCORE 6
+
+{'ham': 750, 'ham_correct': 620, 'spam': 150, 'spam_correct': 130}
+
+SCORE 3
+
+{'ham': 750, 'ham_correct': 620, 'spam': 150, 'spam_correct': 129}
+
+SCORE 1
+
+{'ham': 750, 'ham_correct': 620, 'spam': 150, 'spam_correct': 130}

@@ -1,0 +1,17 @@
+# How many points before a mail is considered spam.
+required_score           3
+
+# Enable rule-based filtering
+score BAYES_99 2.0
+score BAYES_00 -2.0
+
+# Set scores for other rules
+score RDNS_NONE 2.5
+score SPF_HELO_PASS -1.0
+score URIBL_BLOCKED 2.0
+score HTML_MESSAGE 0.5
+score MIME_HTML_ONLY 1.0
+
+# Adjust other SpamAssassin settings as needed
+report_safe 0
+use_bayes 0
